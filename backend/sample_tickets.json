@@ -1,0 +1,20 @@
+[
+  {
+    "id": "TICKET-245",
+    "subject": "Connecting Snowflake to Atlan - required permissions?",
+    "body": "Hi team, we're trying to set up our primary Snowflake production database as a new source in Atlan, but the connection keeps failing. We've tried using our standard service account, but it's not working. Our entire BI team is blocked on this integration for a major upcoming project, so it's quite urgent. Could you please provide a definitive list of the exact permissions and credentials needed on the Snowflake side to get this working? Thanks.",
+    "channel": {"type": "email", "id": "yashasvisharma1369@gmail.com"}
+  },
+  {
+    "id": "TICKET-301",
+    "subject": "How to create lineage for dbt models",
+    "body": "What's the recommended way to ensure lineage is generated for our dbt models after nightly runs?",
+    "channel": {"type": "whatsapp", "id": "+91-7828115995"}
+  },
+  {
+    "id": "TICKET-412",
+    "subject": "Connector issue: BigQuery ingestion job failing",
+    "body": "We see repeated failures on the BigQuery connector with error code 403.",
+    "channel": {"type": "email", "id": "yashasvisharma1369@gmail.com"}
+  }
+]

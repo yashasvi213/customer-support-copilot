@@ -54,12 +54,16 @@ class Classification(BaseModel):
     sentiment: str = Field(description="The sentiment of the ticket, e.g., 'Frustrated'")
     priority: str = Field(description="The priority level, e.g., 'P0'")
 
+class AnswerConfidence(BaseModel):
+    confidence: float = Field(description="Confidence 0-1 that the generated answer is correct and grounded")
+
 structured_llm = llm.with_structured_output(Classification)
 
 class State(TypedDict):
     question: str
     context: List[Document]
     answer: str
+    answer_confidence: float
     classification: dict
 
 def retrieve(state: State):
@@ -69,8 +73,28 @@ def retrieve(state: State):
 def generate(state: State):
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     messages = prompt.invoke({"question": state["question"], "context": docs_content})
-    response = llm.invoke(messages)
-    return {"answer": response.content}
+    answer_msg = llm.invoke(messages)
+
+    # Confidence scoring for the generated answer
+    confidence_prompt = ChatPromptTemplate.from_template(
+        """
+        You are evaluating the quality of an assistant's answer given retrieved context.
+        Score a single number 'confidence' from 0 to 1 (float) for how well the answer is grounded,
+        accurate, and complete according to the provided context.
+        Return only the 'confidence' field.
+
+        Question:\n{question}\n\nContext:\n{context}\n\nAnswer:\n{answer}
+        """
+    )
+    conf_messages = confidence_prompt.invoke({
+        "question": state["question"],
+        "context": docs_content,
+        "answer": answer_msg.content,
+    })
+    conf_llm = llm.with_structured_output(AnswerConfidence)
+    conf_resp = conf_llm.invoke(conf_messages)
+
+    return {"answer": answer_msg.content, "answer_confidence": float(getattr(conf_resp, 'confidence', 0.0))}
 
 def classify(state: State):
     classification_prompt = tagging_prompt.invoke({"input": state["question"]})
@@ -89,7 +113,22 @@ graph_builder.add_edge("generate", "classify")
 
 graph = graph_builder.compile()
 
-def run_rag_graph(question: str) -> str:
+def run_rag_graph(question: str) -> dict:
     """Call this from rag_agent.py"""
     response = graph.invoke({"question": question})
-    return response.get("answer", "")
+    # Try to collect source URLs/identifiers from context metadata
+    sources = []
+    try:
+        ctx = response.get("context", [])
+        for d in ctx:
+            meta = getattr(d, 'metadata', {}) or {}
+            src = meta.get('source') or meta.get('url') or meta.get('path')
+            if src:
+                sources.append(src)
+    except Exception:
+        pass
+    return {
+        "answer": response.get("answer", ""),
+        "confidence": response.get("answer_confidence", 0.0),
+        "sources": sources,
+    }
