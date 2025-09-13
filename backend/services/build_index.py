@@ -16,7 +16,7 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
 vector_store = Chroma(
     collection_name="example_collection",
     embedding_function=embeddings,
-    persist_directory="./chroma_langchain_db",
+    persist_directory=os.getenv("CHROMA_PERSIST_DIRECTORY", "./chroma_langchain_db"),
 )
 
 def get_all_urls(base_url: str) -> list:
@@ -51,24 +51,43 @@ def get_all_urls(base_url: str) -> list:
 
     return list(set(urls))
 
-def build_index(base_url="https://docs.atlan.com"):
-    urls = get_all_urls(base_url)
+def build_index():
+    # Build index for both docs.atlan.com and developer.atlan.com
+    base_urls = [
+        "https://docs.atlan.com",
+        "https://developer.atlan.com"
+    ]
+    
+    all_docs = []
+    
+    for base_url in base_urls:
+        print(f"\n=== Building index for {base_url} ===")
+        urls = get_all_urls(base_url)
 
-    if not urls:
-        raise Exception("No URLs found to load")
+        if not urls:
+            print(f"No URLs found for {base_url}")
+            continue
 
-    # Load content from URLs
-    loader = SeleniumURLLoader(urls=urls)
-    docs = loader.load()
-    print(f"Loaded {len(docs)} documents from {len(urls)} URLs")
+        # Load content from URLs
+        loader = SeleniumURLLoader(urls=urls)
+        docs = loader.load()
+        print(f"Loaded {len(docs)} documents from {len(urls)} URLs")
 
-    # Add last_updated metadata
-    for doc in docs:
-        doc.metadata["last_updated"] = datetime.utcnow().isoformat()
+        # Add source and last_updated metadata
+        for doc in docs:
+            doc.metadata["last_updated"] = datetime.utcnow().isoformat()
+            doc.metadata["source_site"] = base_url
+
+        all_docs.extend(docs)
+
+    if not all_docs:
+        raise Exception("No documents found to load from any source")
+
+    print(f"\nTotal documents loaded: {len(all_docs)}")
 
     # Split documents
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    all_splits = text_splitter.split_documents(docs)
+    all_splits = text_splitter.split_documents(all_docs)
     print(f"Split into {len(all_splits)} chunks")
 
     # Avoid re-indexing existing sources

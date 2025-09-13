@@ -3,7 +3,7 @@ import os
 from typing import List
 
 if not os.environ.get("OPENAI_API_KEY"):
-  os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter API key for OpenAI: ")
+  raise EnvironmentError("OPENAI_API_KEY environment variable is required")
 
 from langchain.chat_models import init_chat_model
 

@@ -1,15 +1,18 @@
 import os
 from dotenv import load_dotenv
 import getpass
-from backend.graph import run_rag_graph
+try:
+    from graph import run_rag_graph
+except ImportError:
+    from backend.graph import run_rag_graph
 
 load_dotenv()
 
-# Load API keys interactively if missing
+# Environment variables should be set via Docker or .env file
 if not os.getenv("LANGSMITH_API_KEY"):
-    os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter LangSmith API key: ")
+    raise EnvironmentError("LANGSMITH_API_KEY environment variable is required")
 if not os.getenv("OPENAI_API_KEY"):
-    os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter OpenAI API key: ")
+    raise EnvironmentError("OPENAI_API_KEY environment variable is required")
 
 if __name__ == "__main__":
     while True:

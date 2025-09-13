@@ -1,0 +1,33 @@
+# Core Flask dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+python-dotenv==1.0.0
+
+# LangChain ecosystem - using compatible versions
+langchain>=0.1.0
+langchain-openai>=0.1.0
+langchain-chroma>=0.1.0
+langchain-community>=0.0.10
+langchain-text-splitters>=0.0.1
+langgraph>=0.0.20
+langsmith>=0.0.77
+
+# Data processing
+pydantic>=2.5.0
+typing-extensions>=4.8.0
+
+# Web scraping and document processing
+beautifulsoup4>=4.12.2
+requests>=2.31.0
+selenium>=4.15.0
+
+# Data visualization (for reports)
+matplotlib>=3.8.2
+seaborn>=0.13.0
+
+# Vector database
+chromadb>=0.4.18
+
+# Other utilities
+numpy>=1.24.3
+pandas>=2.1.4

@@ -4,7 +4,10 @@ from typing import Dict, Optional
 from pydantic import BaseModel
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from backend.graph import run_rag_graph
+try:
+    from graph import run_rag_graph
+except ImportError:
+    from backend.graph import run_rag_graph
 
 class ResolutionOutput(BaseModel):
     needs_rag: bool
@@ -41,6 +44,7 @@ def resolve_query(classification_output: Dict) -> ResolutionOutput:
             rag = run_rag_graph(question)
             confidence = float(rag.get("confidence", 0.0))
             answer = rag.get("answer")
+
             sources = rag.get("sources") or []
 
             if confidence >= 0.75:
@@ -70,6 +74,7 @@ def resolve_query(classification_output: Dict) -> ResolutionOutput:
                 return ResolutionOutput(
                     needs_rag=True,
                     response=None,
+                    routed_message=f"Thank you for your question. We're reviewing this with our specialist team and will get back to you within 24 hours with a detailed response. Your ticket has been assigned to our technical support team.",
                     reason=f"Low confidence ({confidence:.2f}). Escalated to human team with context.",
                     answer_confidence=confidence,
                 )
