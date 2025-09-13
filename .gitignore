@@ -1,9 +1,7 @@
 # Dependencies
 node_modules/
-frontend/node_modules/
 
 # Build outputs
-frontend/dist/
 dist/
 
 # Environment variables
@@ -11,7 +9,7 @@ dist/
 .env.local
 .env.production
 
-# Python
+# Python (for backend reference)
 __pycache__/
 *.pyc
 *.pyo
@@ -26,6 +24,9 @@ env/
 *.sqlite3
 chroma_db_atlan_docs/
 chroma_langchain_db/
+
+# Backend files (not needed for frontend deployment)
+backend/
 
 # IDE
 .vscode/
@@ -43,6 +44,9 @@ logs/
 
 # Docker
 .dockerignore
+Dockerfile.*
+docker-compose.yml
+docker-setup.sh
 
 # Temporary files
 *.tmp
