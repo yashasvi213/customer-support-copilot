@@ -13,6 +13,16 @@ An **AI-powered support assistant** that ingests, classifies, and responds to cu
 
 ---
 
+## 🚀 Features
+
+* **AI Ticket Classification** → Automatically categorizes tickets by topic, sentiment, and priority.  
+* **Smart Response Generation** → Generates AI-powered responses using RAG + GPT models.  
+* **Bulk Ticket Processing** → Handles multiple tickets simultaneously with streaming updates.  
+* **Analytics Dashboard** → Visualizes topic distribution, confidence scores, and performance metrics.  
+* **Interactive Agent** → Lets users query past tickets and documents in a chat-like interface.  
+
+---
+
 ## 🏗️ System Overview
 <p align="center">
   <img src="https://i.postimg.cc/D06r0NgT/Screenshot-from-2025-09-14-12-12-03.png" alt="AI Pipeline Nodes"/>
